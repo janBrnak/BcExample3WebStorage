@@ -3,11 +3,11 @@
 <!-- config.xml reference: https://build.phonegap.com/docs/config-xml -->
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id        = "com.phonegap.exampleGeolocation"
+        id        = "com.phonegap.exampleKeyValueStorage"
         version   = "1.0.0">
 
-    <name>1. Example geolocation</name>
-    <description>1. Example geolocation.</description>
+    <name>3. Example key value storages</name>
+    <description>3. Example key value storages.</description>
     <author email="j.brnak@gmail.com" href="">Jan Brnak</author>
 
     <!--
