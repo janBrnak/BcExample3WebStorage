@@ -34,7 +34,7 @@ var app = {
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         onLoad();
-        console.log("SUCCESS: Load device");
+        console.log("SUCCESS: On device read");
     }
 };
 
@@ -75,6 +75,11 @@ function onLoad() {
         var options = new ContactFindOptions();
         var fields = ["displayName", "phoneNumbers"];
 
+        if (!value || value.length < 3) {
+            alert("Povinný počet znakov je 3 a viac!");
+            return false;
+        }
+
         options.filter = value;
         options.multiple = true;
         loader.show();
@@ -84,26 +89,30 @@ function onLoad() {
         return false;
     });
 
-    // remove session item
-    $("a#sessionRemoveItem").click(function() {
-        var key = $("#sessionStorage").data("key");
-        removeItem(key, "session");
-    });
-
-    // remove locale item
-    $("a#localeRemoveItem").click(function() {
-        var key = $("#sessionStorage").data("key");
-        removeItem(key, "locale");
-    });
+    console.log("SUCCESS: On load page");
 };
 
 // callback on success
 function onSuccess(contacts) {
-    var table = $("table#searchResult");
     var key = $("#value").val();
+    var json = loadPhoneNubers(contacts);
+
+    saveData(key, json);
+
+    console.log("SUCCESS: Find contacts");
+}
+
+// callback on error
+function onError(error) {
+    console.log("ERROR: Find contacts");
+}
+
+// load phone nubers to table
+function loadPhoneNubers(contacts) {
+    var table = $("table#searchResult");
     var length = contacts.length;
     var html = "";
-    var json = {};
+    var json = new Array();
     var i = 0;
 
     for (i = 0; i < length; i++) {
@@ -116,20 +125,14 @@ function onSuccess(contacts) {
             html += "   <td>" + phoneNumbers + "</td>";
             html += "</tr>";
 
-            json[i] = {"displayName": displayName, "phoneNumbers": phoneNumbers};
+            json.push({"displayName": displayName, "phoneNumbers": phoneNumbers});
         }
     }
     table.children("tbody").html(html);
     table.show();
     loader.hide();
 
-    saveData(key, json);
-    console.log("SUCCESS: find contacts");
-}
-
-// callback on error
-function onError(error) {
-    console.log("ERROR: find contacts");
+    return json;
 }
 
 // load data from local and session storage
@@ -142,27 +145,29 @@ function loadData() {
 
     if (sLength) {
         for (s in sessionStorage) {
-            if (localStorage[s] !== undefined) {
-                var key = "";
-                var object = JSON.parse(sessionStorage[s]);
-
+            if (sessionStorage[s] !== undefined) {
                 // ak kluci nenachadza prefix, znamena to, ze nejde mo moje data zo storagu
                 if (s.indexOf(prefix) === -1)
                     continue;
 
-                key = s.replace(prefix, "");
+                var key = s.replace(prefix, "");;
+                var object = JSON.parse(sessionStorage[s]);
 
                 sHtml += "<tr>";
-                sHtml += "   <td>" + key + "</td>";
-                //sHtml += "   <td></td>";
-                //sHtml += "   <td><a href='JavaScript:void(0);' id='sessionRemoveItem'  data-key='" + key + "' title='Zmazat'>Zmazat</a></td>";
+                sHtml += "  <td>" + key + "</td>";
+                sHtml += "  <td width='20'></td>";
+                sHtml += "  <td><a href='#' onclick='loadItemNumbers(\"" + key + "\", \"session\");' title='Zobraziť'>Zobraziť</a></td>";
+                sHtml += "  <td><a href='#' onclick='removeFromStorage(\"" + key + "\", \"session\");' title='Zmazať'>Zmazať</a></td>";
                 sHtml += "</tr>";
             }
         }
 
         sTable.children("tbody").html(sHtml);
         sTable.show();
+        console.log("SUCCESS: Load data session storage");
     }
+    else
+        sTable.children("tbody").html(sHtml);
 
     // local
     var lLength = localStorage.length;
@@ -173,27 +178,31 @@ function loadData() {
     if (lLength) {
         for (l in localStorage) {
             if (localStorage[l] !== undefined) {
-                var key = "";
-                var object = JSON.parse(localStorage[l]);
-
                 // ak kluci nenachadza prefix, znamena to, ze nejde mo moje data zo storagu
                 if (l.indexOf(prefix) === -1)
                     continue;
 
-                key = l.replace(prefix, "");
+                var key = l.replace(prefix, "");;
+                var object = JSON.parse(localStorage[l]);
 
                 lHtml += "<tr>";
-                lHtml += "   <td>" + key + "</td>";
-                //lHtml += "   <td></td>";
-                //lHtml += "   <td><a href='JavaScript:void(0);' id='localeRemoveItem' data-key='" + key + "' title='Zmazat'>Zmazat</a></td>";
+                lHtml += "  <td>" + key + "</td>";
+                lHtml += "  <td width='20'></td>";
+                lHtml += "  <td><a href='#' onclick='loadItemNumbers(\"" + key + "\", \"local\");' title='Zobraziť'>Zobraziť</a></td>";
+                lHtml += "  <td><a href='#' onclick='removeFromStorage(\"" + key + "\", \"local\");' title='Zmazať'>Zmazať</a></td>";
                 lHtml += "</tr>";
             }
         }
 
         lTable.children("tbody").html(lHtml);
         lTable.show();
-        console.log("SUCCESS: Load data");
+        console.log("SUCCESS: Load data local storage");
     }
+    else
+        lTable.children("tbody").html(lHtml);
+
+    console.log(sessionStorage);
+    console.log(localStorage);
 }
 
 // save data into local and session storage
@@ -201,10 +210,15 @@ function saveData(key, json) {
     json = JSON.stringify(json);
 
     // session
-    sessionStorage.removeItem(prefix + key);
+    if (sessionStorage[prefix + name] !== undefined)
+        sessionStorage.removeItem(prefix + key);
+
     sessionStorage.setItem(prefix + key, json);
+
     // local
-    localStorage.removeItem(prefix + key);
+    if (localStorage[prefix + name] !== undefined)
+        localStorage.removeItem(prefix + key);
+
     localStorage.setItem(prefix + key, json);
 
     loadData();
@@ -212,24 +226,79 @@ function saveData(key, json) {
 }
 
 // return string with phone phoneNumbers
-function numbersObjectToString(object) {
-    var length = object.length;
+function numbersObjectToString(numbers) {
+    var length = numbers.length;
     var result = "";
     var i = 0;
 
-    if (length) {
-        result += object[i].value;
+    switch (typeof numbers) {
+        // object
+        case 'object':
+            if (length) {
+                result += numbers[i].value;
 
-        for (i = 1; i < length; i++) {
-            result += ", " + object[i].value;
-        }
+                for (i = 1; i < length; i++) {
+                    result += ", " + numbers[i].value;
+                }
+            }
+            break;
+        // string
+        case 'string':
+            result = numbers;
+            break;
     }
 
     return result;
 }
 
-function removeItem(id, type) {
-    // alert(id);
-    // alert(type);
+// load contacts from storages
+function loadItemNumbers(name, storage) {
+    var contacts = [];
+
+    switch (storage) {
+        // session
+        case 'session':
+            if (sessionStorage[prefix + name] !== undefined) {
+                contacts = JSON.parse(localStorage[prefix + name]);
+
+                loadPhoneNubers(contacts);
+            }
+
+            break;
+        // local
+        case 'local':
+            if (localStorage[prefix + name] !== undefined) {
+                contacts = JSON.parse(localStorage[prefix + name]);
+
+                loadPhoneNubers(contacts);
+            }
+
+            break;
+    }
+
+    console.log("SUCCESS: Load item numbers");
+    return false;
+}
+
+// remove item from storage
+function removeFromStorage(name, storage) {
+    switch (storage) {
+        // session
+        case 'session':
+            if (sessionStorage[prefix + name] !== undefined)
+                sessionStorage.removeItem(prefix + name);
+
+            break;
+        // local
+        case 'local':
+            if (localStorage[prefix + name] !== undefined)
+                localStorage.removeItem(prefix + name);
+
+            break;
+    }
+
+    loadData();
+    console.log("SUCCESS: Remove item");
+    return false;
 }
 
