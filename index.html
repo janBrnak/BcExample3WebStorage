@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <!--<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />-->
+        <!--<meta http-equiv="X-UA-Compatible" content="IE=edge" />-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <title>2.3.7 key value storage</title>
+    </head>
+    <body>
+        <div class="app">
+            <h1>2.3.7 key value storage</h1>
+            <h2>Vyhľadaj kontakt(<span class="toogleForm">zobraziť/skryť</span>)</h2>
+            <form id="keyValueStorage" name="keyValueStorage" method="post">
+                <input type="hidden" id="id" name="id" value="">
+                <div class="input text">
+                    <label for="value">Vyhľadaj kontakt: </label>
+                    <input type="text" id="value" name="value" required />
+                </div>
+                <table cellspacing="0" cellspacing="0">
+                    <tr>
+                        <td><input type="submit" /></td>
+                        <td style="width: 100px;text-align:center;"><strong><a href="JavaScript:void(0);" onclick="resetForm();" title="Reset form">Reset form</a></strong></td>
+                        <td style="width: 100px;text-align:center;"><strong><a href="JavaScript:void(0);" onclick="resetStorage();" title="Reset storage">Reset storage</a></strong></td>
+                    </tr>
+                </table>
+            </form>
+            <br />
+            <br />
+            <h2>Zoznam kontaktov:</h2>
+            <table id="searchResult" class="listItems">
+                <thead>
+                    <tr>
+                        <th>Meno</th>
+                        <th>Telfónne číslo</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <br />
+            <h2>Posledné hľadané frázy (session storage)</h2>
+            <table id="sessionStorage" class="listItems">
+                <!--
+                <thead>
+                    <tr>
+                        <th>Názov</th>
+                        <th>Dátum</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                -->
+                <tbody>
+
+                </tbody>
+            </table>
+            <br />
+            <h2>Posledné hľadané frázy (local storage)</h2>
+            <table id="localStorage" class="listItems">
+                <!--
+                <thead>
+                    <tr>
+                        <th>Názov</th>
+                        <th>Dátum</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                -->
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="loader"></div>
+        <br />
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+    </body>
+</html>
