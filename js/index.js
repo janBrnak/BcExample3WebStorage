@@ -69,11 +69,6 @@ function onLoad() {
 
     loadData();
 
-    // slide formular
-    $("span.toogleForm").click(function() {
-        $("#keyValueStorage").slideToggle("slow");
-    });
-
     // submit form
     $("#keyValueStorage").submit(function(event) {
         var value = $("#value").val();
