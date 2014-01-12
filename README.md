@@ -1,5 +1,5 @@
-3. Príklad key value storage
-============================
+3. Príklad Web sotrage
+======================
 
 ## Local storage
 
