@@ -36,14 +36,6 @@ h3 {
     opacity: 0.8;
 }
 
-h2 span.toogleForm {
-    font-weight: normal;
-    font-style: italic;
-    text-decoration: underline;
-    cursor: pointer;
-    color: #563d7c;
-}
-
 .input {
     margin-bottom: 12px;
     max-width: 500px;
